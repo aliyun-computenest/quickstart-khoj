@@ -219,7 +219,7 @@ Resources:
           - Ref: EcsVpc
           - Ref: VpcId
       SecurityGroupIngress:
-        - PortRange: 7860/7860
+        - PortRange: 42110/42110
           Priority: 1
           SourceCidrIp: 0.0.0.0/0
           IpProtocol: tcp
@@ -264,6 +264,21 @@ Resources:
       InternetMaxBandwidthOut: 5
       InternetChargeType: PayByBandwidth
       IoOptimized: optimized
+  RunInstallCommand:
+    Type: ALIYUN::ECS::RunCommand
+    Properties:
+      InstanceIds:
+        Fn::GetAtt:
+          - InstanceGroup
+          - InstanceIds
+      Type: RunShellScript
+      Sync: true
+      Timeout: 3600
+      CommandContent: |-
+        #!/bin/bash
+        cd /root/khoj
+        docker compose up -d
+
 Outputs:
   Khoj_address:
     Description:
@@ -271,7 +286,7 @@ Outputs:
       zh-cn: Khoj 访问页面
     Value:
       Fn::Sub:
-        - http://${ServerAddress}:7860
+        - http://${ServerAddress}:42110
         - ServerAddress:
             Fn::Select:
               - 0
