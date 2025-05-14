@@ -1,0 +1,49 @@
+Service:
+  RegionId: cn-hangzhou
+  DeployType: ros
+  DeployMetadata:
+    SupplierDeployMetadata:
+      ArtifactRelation:
+        centos_7:
+          ArtifactId: ${Artifact.Artifact.ArtifactId}
+          ArtifactVersion: ${Artifact.Artifact.ArtifactVersion}
+  ServiceType: private
+  ServiceInfo:
+    - Agreements: []
+      Image: resources/icons/service_logo.png
+      Locale: zh-CN
+      Name: khoj社区版
+      ShortDescription: Khoj 是一款开源的个人人工智能。你可以和它聊任何话题。它会使用你分享的文件进行回复。它还可以访问公共互联网上的信息。
+      Softwares: []
+  ShareType: Public
+  ApprovalType: Manual
+Artifact:
+  Artifact:
+    ArtifactType: EcsImage
+    ArtifactName: khoj
+    Description: khoj
+    ArtifactProperty:
+      RegionId: ${ImageBuilder.EcsImage.RegionId}
+      ImageId: ${ImageBuilder.EcsImage.SourceImageId}
+ImageBuilder:
+  EcsImage:
+    RegionId: ap-southeast-1
+    SourceImageId: ubuntu_24_04_x64_20G_alibase_20250317.vhd
+    SystemDiskSize: 40
+    InstanceType: ecs.c6.large
+    InternetMaxBandwidthOut: 100
+    CommandType: RunShellScript
+    Timeout: 10800
+    Tags: [ ]
+    CommandContent: |-
+        # 安装docker-ce
+        apt-get update
+        apt-get -y install apt-transport-https ca-certificates curl software-properties-common
+        curl -fsSL http://mirrors.cloud.aliyuncs.com/docker-ce/linux/ubuntu/gpg | apt-key add -
+        add-apt-repository -y "deb [arch=$(dpkg --print-architecture)] http://mirrors.cloud.aliyuncs.com/docker-ce/linux/ubuntu $(lsb_release -cs) stable"
+        apt-get -y install docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+        sudo systemctl enable --now docker.service
+
+        https://github.com/khoj-ai/khoj.git
+        cd /root/khoj
+        docker compose up -d
